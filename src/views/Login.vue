@@ -145,7 +145,7 @@
 
 import Vue from "vue";
 import axios from "axios";
-import { loadLanguageAsync } from "../i18n-setup";
+import { getLocale, setLocale } from "../i18n-setup";
 import { privacyNotice } from "@/content/privacy";
 import LanguageSelect from "@/components/LanguageSelect";
 import { credentialsOverride } from "@/utils/devOverrides";
@@ -346,7 +346,7 @@ export default {
 
       localStorage.authResponse = JSON.stringify(response)
 
-      this.$i18n.locale = response.data.cred.user.language;
+      setLocale(response.data.cred.user.language);
       // `Vue.config.lang` was Element UI 2's locale switch; Element Plus reads the locale from
       // the i18n instance, and Vue 3 has no global `Vue` object — the assignment threw here, after
       // the token was stored and before the store commit, so the login looked refused.
@@ -447,7 +447,7 @@ export default {
       return !p.current || !p.first || p.first !== p.second || this.loginunderway;
     },
     privacyLink() {
-      return privacyNotice((this.$i18n && this.$i18n.locale) || "en").link;
+      return privacyNotice(getLocale() || "en").link;
     },
     // `/config` carries `login.github` and `login.entra`: the API is the one that knows whether it
     // holds the client id, secret and redirect URI each sign-in needs, so the console never builds

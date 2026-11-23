@@ -76,7 +76,7 @@ describe('retour de la connexion par fournisseur', () => {
   beforeEach(() => {
     // The catalogue is resolved from the instance locale: messages are read by their key so that
     // the test does not depend on the active language.
-    i18n.global.locale = 'en'
+    i18n.global.locale.value = 'en'
     resetStore()
     localStorage.clear()
     vi.clearAllMocks()

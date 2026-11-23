@@ -131,3 +131,23 @@ jobs:
             } else {
               await github.rest.issues.createComment({ owner, repo, issue_number, body })
             }
+
+  # Dependency hygiene, production scope only. `--omit=dev` on purpose: the webpack dev-server
+  # advisories concern `npm run serve`, never the bundle that ships, and a job that is red for a
+  # reason nobody can act on is a job everyone learns to ignore. `npm audit` reads the lockfile,
+  # so this needs no install and no build — it fails in ten seconds when a runtime dependency
+  # (vue-i18n, axios, dompurify…) crosses the threshold.
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Audit the runtime dependencies
+        run: npm audit --omit=dev --audit-level=high

@@ -66,7 +66,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   vi.useFakeTimers()
   resetStore()
-  i18n.global.locale = 'en'
+  i18n.global.locale.value = 'en'
   localStorage.clear()
   notify = vi.fn()
   message = vi.fn()
@@ -217,7 +217,7 @@ describe('Login.vue — connexion', () => {
     await el.trigger('change')
 
     expect(select.exists()).toBe(true)
-    expect(i18n.global.locale).toBe('fr')
+    expect(i18n.global.locale.value).toBe('fr')
     expect(localStorage.nyx_language).toBe('fr')
     expect(document.documentElement.lang).toBe('fr')
   })

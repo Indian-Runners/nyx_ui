@@ -15,7 +15,7 @@ import draggable from 'vuedraggable'
 import InfiniteLoading from 'vue3-infinite-loading'
 import numeral from 'numeral'
 import { elementIcons } from './utils/elementIcons'
-import { i18n, elementLocale } from './i18n-setup'
+import { i18n, elementLocale, getLocale, setLocale } from './i18n-setup'
 import VIcon from './components/VIcon.vue'
 import { filters } from '@/utils/filters'
 import { getUrlVars, resolveLanguage } from '@/utils/language'
@@ -38,7 +38,7 @@ try {
   storage = window.localStorage
 } catch (e) { /* storage refused */ }
 
-i18n.global.locale = resolveLanguage(vars, storage)
+setLocale(resolveLanguage(vars, storage))
 
 // Theme before mount: without it, the page shows in light while the session is being
 // restored, then switches — a white flash on every reload. The choice saved on the account
@@ -57,7 +57,7 @@ app.component('infinite-loading', InfiniteLoading)
 app.use(store)
 app.use(router)
 app.use(i18n)
-app.use(ElementPlus, { locale: elementLocale(i18n.global.locale) })
+app.use(ElementPlus, { locale: elementLocale(getLocale()) })
 
 app.config.globalProperties.$globalbus = globalBus
 app.config.globalProperties.$localbus = localBus

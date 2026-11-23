@@ -36,20 +36,31 @@ const messages = {
 
 export const localized_messages = messages
 
-// legacy: true keeps `this.$t` and `this.$i18n.locale = ...` working, which is what the components
-// use. 9.14.5 is the last release of the 9.x line (npm tag `legacy9`) and 9.x is out of support:
-// GHSA-83rm-6c8r-g728, fixed only in 11.4.14+, stays open against it. Moving to 11 means dropping
-// this mode — `$i18n.locale` then becomes a ref, so every read and write in the components
-// (`this.$i18n.locale`, the `"$i18n.locale"` watcher of `App.vue`, the tests) has to say `.value`.
-// The exposure today is nil in practice: the messages are static JSON in the repository, no
-// translated string is built from user input, and `escapeParameter` is not used.
+// Composition mode (`legacy: false`) since vue-i18n 11: the 9.x line is out of support and
+// GHSA-83rm-6c8r-g728 is only fixed from 11.4.14 on. Two consequences for the components:
+// `$t` keeps working through `globalInjection`, but the locale is now a ref — `this.$i18n.locale`
+// no longer reads or writes it. Use `getLocale()` / `setLocale()` below instead, which keeps the
+// call sites readable and hides the `.value`.
 export const i18n = createI18n({
   locale: 'en',
   fallbackLocale: 'en',
   messages,
-  legacy: true,
+  // Explicit: without it `createI18n` still defaults to the legacy API, where `locale` is a plain
+  // string and `$i18n` replaces `$t` — the migration would silently not happen.
+  legacy: false,
   globalInjection: true,
 })
+
+/** The active locale code, e.g. `'fr'`. */
+export function getLocale() {
+  return i18n.global.locale.value
+}
+
+/** Switch the active locale. An empty code is ignored: it would leave the console untranslated. */
+export function setLocale(lang) {
+  if (!lang) return
+  i18n.global.locale.value = lang
+}
 
 const locales = { en: enLocale, fr: frLocale, el: elLocale, nl: nlLocale }
 

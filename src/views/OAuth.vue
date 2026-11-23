@@ -36,6 +36,7 @@
  */
 import axios from "axios";
 import { getUrlVars } from "@/utils/language";
+import { setLocale } from "@/i18n-setup";
 
 export default {
   name: "OAuth",
@@ -83,7 +84,7 @@ export default {
 
       localStorage.authResponse = JSON.stringify(response);
       if (data.cred.user.language) {
-        this.$i18n.locale = data.cred.user.language;
+        setLocale(data.cred.user.language);
       }
       // `ReportTask` reads `creds.user.user` for report ownership; the password form sets it from
       // the field it posted.

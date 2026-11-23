@@ -15,6 +15,7 @@
 <script>
 /* eslint-disable */
 import _ from "lodash";
+import { getLocale } from "@/i18n-setup";
 import moment from "moment";
 
 import { currentTheme } from "@/utils/theme";
@@ -107,7 +108,7 @@ export default {
           (this.$store.getters.creds &&
             this.$store.getters.creds.user &&
             this.$store.getters.creds.user.language) ||
-          this.$i18n.locale ||
+          getLocale() ||
           "";
 
         var url=this.config.config.url.replace(

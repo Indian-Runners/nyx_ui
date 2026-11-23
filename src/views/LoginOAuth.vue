@@ -77,7 +77,7 @@ import Vue from "vue";
 import axios from "axios";
 import VueAxios from 'vue-axios'
 import VueAuthenticate from 'vue-authenticate'
-import { loadLanguageAsync } from "../i18n-setup";
+import { setLocale } from "../i18n-setup";
 
 Vue.use(VueAxios, axios)
 Vue.use(VueAuthenticate, {
@@ -167,9 +167,8 @@ export default {
 
       localStorage.authResponse = JSON.stringify(response)
 
-      this.$i18n.locale = response.data.cred.user.language;
+      setLocale(response.data.cred.user.language);
       // Vue 3 has no global `Vue` object: see Login.vue.
-      //alert(this.$i18n.locale);
 
       response.data.cred.user.user = this.form.login;
       this.$store.commit({

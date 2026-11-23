@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { getLocale, setLocale } from "@/i18n-setup";
 /**
  * Language selector.
  *
@@ -34,13 +35,13 @@ export default {
   },
   computed: {
     current() {
-      return (this.$i18n && this.$i18n.locale) || "en";
+      return getLocale() || "en";
     },
   },
   methods: {
     change(code) {
       if (!code || code === this.current) return;
-      this.$i18n.locale = code;
+      setLocale(code);
       document.documentElement.lang = code;
       try {
         localStorage.nyx_language = code;

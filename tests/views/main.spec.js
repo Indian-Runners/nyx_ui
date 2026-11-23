@@ -77,7 +77,7 @@ beforeEach(() => {
   vi.useFakeTimers()
   globalBus.all.clear()
   resetStore(seededState())
-  i18n.global.locale = 'en'
+  i18n.global.locale.value = 'en'
   localStorage.clear()
 })
 
@@ -280,7 +280,7 @@ describe('App.vue — coquille', () => {
   it('retient la langue choisie sur le document et dans le stockage', async () => {
     const { wrapper } = await mountView(App, { mocks: { $notify: vi.fn() }, stubs: { 'router-view': true } })
 
-    i18n.global.locale = 'nl'
+    i18n.global.locale.value = 'nl'
     await wrapper.vm.$nextTick()
 
     expect(document.documentElement.lang).toBe('nl')
