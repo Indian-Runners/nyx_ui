@@ -66,7 +66,7 @@ export async function mountView(component, options = {}) {
     router: providedRouter = null,
   } = options
 
-  i18n.global.locale = options.locale || 'en'
+  i18n.global.locale.value = options.locale || 'en'
 
   const router = providedRouter || makeRouter()
   await router.push(at)

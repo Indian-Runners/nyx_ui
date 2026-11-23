@@ -26,7 +26,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  i18n.global.locale = 'en'
+  i18n.global.locale.value = 'en'
 })
 
 describe('Privacy.vue', () => {
@@ -87,7 +87,7 @@ describe('Privacy.vue', () => {
 
   it('suit la langue de l\'instance i18n', async () => {
     axios.get.mockResolvedValue({ data: { error: '' } })
-    i18n.global.locale = 'fr'
+    i18n.global.locale.value = 'fr'
 
     const { wrapper } = await mountView(Privacy, { locale: 'fr' })
 

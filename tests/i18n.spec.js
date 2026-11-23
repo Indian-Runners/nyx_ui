@@ -18,9 +18,9 @@ describe('i18n setup', () => {
   })
 
   it('starts in English and falls back on English', () => {
-    // Vue 3 / vue-i18n 9: the instance is reachable through `.global`.
-    expect(i18n.global.locale).toBe('en')
-    expect(i18n.global.fallbackLocale).toBe('en')
+    // vue-i18n 11 runs in composition mode: `global.locale` and `global.fallbackLocale` are refs.
+    expect(i18n.global.locale.value).toBe('en')
+    expect(i18n.global.fallbackLocale.value).toBe('en')
   })
 
   it('merges the Element UI pack into every language', () => {

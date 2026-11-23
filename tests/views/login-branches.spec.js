@@ -59,7 +59,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   vi.useFakeTimers()
   resetStore()
-  i18n.global.locale = 'en'
+  i18n.global.locale.value = 'en'
   localStorage.clear()
   notify = vi.fn()
   message = vi.fn()

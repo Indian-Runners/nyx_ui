@@ -1,5 +1,5 @@
 <template>
-  <el-config-provider :locale="elementLocale($i18n.locale)">
+  <el-config-provider :locale="elementLocale(currentLocale)">
     <div id="app" class="nyxapp">    
       <router-view/>
     </div>
@@ -9,7 +9,7 @@
 <script>
 import axios from "axios";
 import _ from "lodash";
-import { elementLocale } from "./i18n-setup";
+import { elementLocale, getLocale } from "./i18n-setup";
 /* eslint-disable */
 export default {
   name: "App",
@@ -18,8 +18,15 @@ export default {
   // while the console labels followed the account from login on. A user whose browser
   // remembered Greek saw a French console and a Greek calendar.
   // `el-config-provider` makes the Element Plus component language reactive.
+  computed: {
+    // The locale is a ref in vue-i18n 11: reading it here makes the whole template, and the
+    // watcher below, reactive to a language change (`setLocale()` from the components).
+    currentLocale() {
+      return getLocale();
+    },
+  },
   watch: {
-    "$i18n.locale": function(locale) {
+    currentLocale(locale) {
       this.rememberLanguage(locale);
     },
   },
@@ -28,7 +35,7 @@ export default {
     wsInterval:null
   }),
   methods: {
-    // The Element Plus language, for `el-config-provider`: reactive, it follows `$i18n.locale`.
+    // The Element Plus language, for `el-config-provider`: reactive, it follows `currentLocale`.
     elementLocale: elementLocale,
     // A chosen language must also be remembered and announced to the document, otherwise the next
     // start begins from another one, and the browser reports the wrong language to screen readers.

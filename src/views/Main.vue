@@ -218,6 +218,7 @@
 
 <script>
 import { registerComponent } from '@/utils/vue3shim'
+import { setLocale } from '@/i18n-setup'
 import axios from "axios";
 import logout from "@/components/Logout";
 import apps from "@/components/Apps";
@@ -569,7 +570,7 @@ export default {
 
             // Restore the user's language after a page reload.
             if(authResponse.data.cred.user.language != undefined) {
-              this.$i18n.locale = authResponse.data.cred.user.language;
+              setLocale(authResponse.data.cred.user.language);
             }
             
             this.$store.commit({
