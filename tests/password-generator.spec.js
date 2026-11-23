@@ -26,6 +26,23 @@ const RULES = { length: [12, 18], forceUpper: true, minUpper: 2, forceNumber: tr
 
 const count = (value, pattern) => (value.match(pattern) || []).length
 
+/**
+ * Install a CSPRNG whose bytes come from `next()` for the duration of one case.
+ *
+ * `randomInt` fills a `Uint32Array` through rejection sampling, so the stub has to write into the
+ * buffer it is handed. A constant value makes the whole password predictable, which is the only
+ * way to assert that a rule is *not* applied — otherwise the case passes or fails depending on
+ * the draw, and CI goes red once every fifty runs for a generator that is behaving correctly.
+ */
+function stubCsprng(next) {
+  vi.stubGlobal('crypto', {
+    getRandomValues(buffer) {
+      for (let i = 0; i < buffer.length; i++) buffer[i] = next(i)
+      return buffer
+    },
+  })
+}
+
 afterEach(() => {
   vi.unstubAllGlobals()
   vi.restoreAllMocks()
@@ -50,11 +67,45 @@ describe('generatePassword — les règles de l instance', () => {
   })
 
   it('ne compte pas une classe que la règle ne force pas', () => {
-    // `minUpper: 4` with `forceUpper: false` must not push four capitals into the password
+    // `minUpper: 4` with `forceUpper: false` must not push four capitals into the password.
+    // Deterministic: the stubbed CSPRNG only ever yields index 0, so a special character can only
+    // appear if the generator inserts one on purpose — which it must not. Asserting "at most 4"
+    // on a real draw made the case fail roughly once in forty runs: twelve characters drawn from
+    // a 61-character set contain five specials 2 % of the time, and the generator was right.
+    stubCsprng(() => 0)
     const pwd = generatePassword({ length: [12, 12], forceUpper: false, minUpper: 4,
       forceNumber: false, minNumber: 4, forceSpecial: false, minSpecial: 4 })
     expect(pwd).toHaveLength(12)
-    expect(count(pwd, /[!#$%&*+\-=?@^_]/g)).toBeLessThanOrEqual(4)
+    expect(count(pwd, /[!#$%&*+\-=?@^_]/g)).toBe(0)
+    expect(count(pwd, /[A-Z]/g)).toBe(0)
+    expect(count(pwd, /[0-9]/g)).toBe(0)
+  })
+
+  it('écrit le minimum quand la classe est forcée', () => {
+    // Same stub, `forceSpecial: true`: the minimum is inserted exactly, and the rest is drawn from
+    // the full set at index 0 — so the count proves the class is written, not sampled.
+    stubCsprng(() => 0)
+    const pwd = generatePassword({ length: [12, 12], forceUpper: false, minUpper: 4,
+      forceNumber: false, minNumber: 4, forceSpecial: true, minSpecial: 4 })
+    expect(pwd).toHaveLength(12)
+    expect(count(pwd, /[!#$%&*+\-=?@^_]/g)).toBe(4)
+  })
+
+  it('reste déterministe sur une source fixée', () => {
+    // The same seeded bytes must give the same password: it is what makes the two cases above
+    // meaningful, and it catches a stray `Math.random()` reintroduced in a branch of the shuffle.
+    const rules = { length: [14, 14], forceUpper: true, minUpper: 2, forceNumber: true,
+      minNumber: 2, forceSpecial: true, minSpecial: 2 }
+    let seed = 42
+    const next = () => {
+      seed = (seed * 1103515245 + 12345) % 0x80000000
+      return seed
+    }
+    stubCsprng(next)
+    const first = generatePassword(rules)
+    seed = 42
+    const second = generatePassword(rules)
+    expect(second).toBe(first)
   })
 
   it('garde une longueur imposée même étroite', () => {
