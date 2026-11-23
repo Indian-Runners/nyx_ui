@@ -1,0 +1,49 @@
+version: 2
+
+# Version updates. Security *alerts* are reported by the dependency graph on their own; these
+# entries open the pull requests, grouped so a weekly bump does not land as fifteen separate
+# branches. Majors are deliberately left out of the groups: they need a human decision, which
+# is exactly why they deserve their own pull request.
+#
+# `xlsx` is installed from a remote tarball (cdn.sheetjs.com), so Dependabot cannot bump it —
+# it is upgraded by hand, see the comment in package.json.
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Brussels
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      npm-runtime:
+        dependency-type: production
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      npm-dev-tooling:
+        dependency-type: development
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Brussels
+    commit-message:
+      prefix: "ci(deps)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
